@@ -87,17 +87,10 @@ $os_names = array("Unknown" => __('Unknown','wp-power-stats'));
 foreach ($os_data as $os) {
     $oss[] = array("image" => strtolower($os['name']), "percent" => round($os['hits'] / $os_total_hits[0] * 100), "name" => strtr(ucfirst($os['name']), $browser_names));
 }
-/* Änderung: Mehr zeigen */
-$zeige_anzahl = 20;
-$schnitt = 0;
 
-
-
-/* Änderung: Numerisch indiziertes Array  ARRAY_N statt ARRAY_A*/
-$top_posts = $wpdb->get_results("SELECT `s`.`post_id`, `wp`.`post_title` AS `title`, SUM(`s`.`hits`) AS `hits` FROM `{$wpdb->prefix}power_stats_posts` AS `s` LEFT JOIN `{$wpdb->posts}` AS `wp` ON (`s`.`post_id` = `wp`.`id`) GROUP BY `s`.`post_id` ORDER BY `hits` DESC LIMIT $zeige_anzahl", ARRAY_N);
-$top_links = $wpdb->get_results("SELECT `referer`, `count` FROM `{$wpdb->prefix}power_stats_referers` ORDER BY `count` DESC LIMIT $zeige_anzahl", ARRAY_N);
-$top_searches = $wpdb->get_results("SELECT `terms`, `count` FROM `{$wpdb->prefix}power_stats_searches` ORDER BY `count` DESC LIMIT $zeige_anzahl", ARRAY_N);
-
+$top_posts = $wpdb->get_results("SELECT `s`.`post_id`, `wp`.`post_title` AS `title`, SUM(`s`.`hits`) AS `hits` FROM `{$wpdb->prefix}power_stats_posts` AS `s` LEFT JOIN `{$wpdb->posts}` AS `wp` ON (`s`.`post_id` = `wp`.`id`) GROUP BY `s`.`post_id` ORDER BY `hits` DESC LIMIT 10", ARRAY_A);
+$top_links = $wpdb->get_results("SELECT `referer`, `count` FROM `{$wpdb->prefix}power_stats_referers` ORDER BY `count` DESC LIMIT 10", ARRAY_A);
+$top_searches = $wpdb->get_results("SELECT `terms`, `count` FROM `{$wpdb->prefix}power_stats_searches` ORDER BY `count` DESC LIMIT 10", ARRAY_A);
 $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `count` FROM `{$wpdb->prefix}power_stats_visits` GROUP BY `country` ORDER BY `count` DESC", ARRAY_A);
 
 ?><div class="wrap">
@@ -116,13 +109,6 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
                 <div class="inside">
 
                     <table class="summary">
-                        <!-- Änderung, damit Prognose angezeigt wird: -->
-                        <!-- damit Stunde korrekt in der entsprechenden timezone angezeigt wird, muss diese wordpress - Funktion statt date() verwendet werden -->
-            						<?php $stunde = date_i18n("G");     
-            						if ($stunde == 0){
-            							$stunde = 1;
-            						}
-            						?>
                         <thead>
                         <tr>
                             <td></td>
@@ -133,20 +119,9 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
 
                         <tbody>
                         <tr>
-                            <!-- mit Ausgabe der Prognose -->
                             <td><?php _e('Today','wp-power-stats') ?></td>
-                            <td class="value"><?php echo $today_visits[0] . " / Prognose: ". round(($today_visits[0]+$yesterday_visits[0])/($stunde+24)*24,0) ?></td>
-                            <td class="value"><?php echo empty($today_pageviews[0]) ? 0 : $today_pageviews[0] . " / Prognose: ". round(($today_pageviews[0]+$yesterday_pageviews[0])/($stunde+24)*24,0) ?></td>
-                        </tr>
-                        <tr>
-                            <!-- Ausgabe Seiten/Besucher: -->
-                            <?php 
-                            if ($today_pageviews[0] != 0)  {
-                               $schnitt = round($today_pageviews[0]/$today_visits[0],2);
-                            }
-                            ?>
-                            <td></td>
-                            <td class="value"><?php echo "Seiten/Besucher: " . $schnitt ?></td>                           
+                            <td class="value"><?php echo $today_visits[0] ?></td>
+                            <td class="value"><?php echo empty($today_pageviews[0]) ? 0 : $today_pageviews[0] ?></td>
                         </tr>
 
                         <tr>
@@ -287,7 +262,6 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
             <div class="postbox micro">
                 <h3><?php _e('Traffic Source','wp-power-stats') ?></h3>
                 <div class="inside">
-                    <! -- <?php echo "Alle Besucher: " . $total_visits[0] . " / Suchmaschine: " . $search_engine_referers[0] . " / Links:"  . $non_empty_referers[0] . " / Direkt: " . $direct;?> -->
                     <table class="triple">
                         <tbody>
                         <tr>
@@ -394,7 +368,7 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
                             var geomap = new google.visualization.GeoChart(container);
                             geomap.draw(data, options);
 
-                        };
+                        }
 
                     </script><div id="map_canvas" style=" height: 405px; width: 100%; text-align: center; margin: auto;"></div>
 
@@ -416,8 +390,7 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
                         <tbody>
 
                         <?php $i=1; foreach ($top_posts as $post): ?>
-                             <!-- Änderung: Mit Anzahl der Einträge --> 
-                            <tr><td class="order"><?php echo $i ?>.</td><td class="link"><a href="<?php echo get_permalink($post[0]) ?>"><?php echo $post[1]?></a></td><td class="order"><?php echo $post[2] ?></td></tr>
+                            <tr><td class="order"><?php echo $i ?>.</td><td class="link"><a href="<?php echo get_permalink($post['post_id']) ?>"><?php echo esc_html($post['title']) ?></a></td></tr>
                             <?php $i++; endforeach; ?>
 
                         </tbody>
@@ -442,17 +415,7 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
                             <table>
                                 <tbody>
                                 <?php $i=1; foreach ($top_links as $link): ?>
-                                    <!-- Änderung: Mit Anzahl der Einträge, ggfs. nach 50 Zeichen abschneiden -->
-                                    <?php
-                                    $zeichen_link = strlen($link[0]);
-                                    if ($zeichen_link>50){
-                                        $anzeige_link = substr($link[0],0,50) . ' ...';
-                                    }  
-                                    else {
-                                        $anzeige_link = $link[0];
-                                    }
-                                    ?>
-                                    <tr><td class="order"><?php echo $i ?>.</td><td class="link"><a href="<?php echo $link[0]?>" target="_blank"><?php echo $anzeige_link ?></a></td><td class="order"><?php echo $link[1] ?></td></tr>
+                                    <tr><td class="order"><?php echo $i ?>.</td><td class="link"><a href="<?php echo esc_url($link['referer']) ?>" target="_blank"><?php echo esc_url($link['referer']) ?></a></td></tr>
                                     <?php $i++; endforeach; ?>
                                 </tbody>
                             </table>
@@ -473,8 +436,7 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
                             <table>
                                 <tbody>
                                 <?php $i=1; foreach ($top_searches as $search): ?>
-                                    <!-- Änderung: Mit Anzahl der Einträge -->
-                                    <tr><td class="order"><?php echo $i ?>.</td><td class="link"><?php echo $search[0]?></td><td class="order"><?php echo $search[1] ?></td></tr>
+                                    <tr><td class="order"><?php echo $i ?>.</td><td class="link"><?php echo esc_html($search['terms']) ?></td></tr>
                                     <?php $i++; endforeach; ?>
                                 </tbody>
                             </table>
