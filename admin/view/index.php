@@ -59,6 +59,7 @@ $tablet = (!empty($total_visits[0])) ? round($tablet_hits[0] / $total_visits[0] 
 $mobile = (!empty($total_visits[0])) ? round($mobile_hits[0] / $total_visits[0] * 100) : 0;
 
 $visits = $wpdb->get_results("SELECT `v`.`date`, COUNT(`v`.`id`) AS `hits`, `p`.`hits` AS `pageviews` FROM `{$wpdb->prefix}power_stats_visits` AS `v` JOIN `{$wpdb->prefix}power_stats_pageviews` AS `p` ON (`v`.`date` = `p`.`date`) GROUP BY `date` ORDER BY `v`.`date` DESC LIMIT 11", ARRAY_A);
+// für Anzeige der Tagesübersicht, 25.12.2017:
 $visits_tag = $wpdb->get_results("SELECT `v`.`date`, COUNT(`v`.`id`) AS `hits`, `p`.`hits` AS `pageviews` FROM `{$wpdb->prefix}power_stats_visits` AS `v` JOIN `{$wpdb->prefix}power_stats_pageviews` AS `p` ON (`v`.`date` = `p`.`date`) GROUP BY `date` ORDER BY `v`.`date` DESC LIMIT 50", ARRAY_A);
 
 $search_engine_referers = $wpdb->get_row("SELECT COUNT(id) FROM `{$wpdb->prefix}power_stats_visits` WHERE `is_search_engine` = '1'", ARRAY_N);
@@ -507,12 +508,11 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
         
                             <?php
         
-                            $data_array = "";
-                            $visits = array_reverse($visits_tag);
+                            // $visits_tag = array_reverse($visits_tag);
         
-                            if (is_array($visits) && !empty($visits)) {
+                            if (is_array($visits_tag) && !empty($visits_tag)) {
                                     $i=1; 
-                                    foreach ($visits as $day): 
+                                    foreach ($visits_tag as $day): 
                                       if ($day['hits'] === null) $day['hits'] = 0;
                                       if ($day['pageviews'] === null) $day['pageviews'] = 0;
                                       $tag = $day['date'];
