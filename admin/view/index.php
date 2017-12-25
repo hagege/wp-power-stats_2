@@ -501,6 +501,7 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
                         <div class="inside">
                           <table>
                            <tbody>
+                            <tr><td class="order"><?php echo "Tag"?></td><td class="order"><?php echo "Besucher"?></td><td class="order"><?php echo "Seitenaufrufe"?></td></tr>                                 
         
                             <?php
         
@@ -516,7 +517,7 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
                                       $besucher = $day['hits'];
                                       $seitenaufrufe = $day['pageviews']; 
                                       ?>
-                                      <tr><td class="order"><?php echo $i ?>.</td><td class="link"><?php echo $tag?></td><td class="link"><?php echo $besucher?></td><td class="link"><?php echo $seitenaufrufe?></td></tr>                                 
+                                      <tr><td class="order"><?php echo $tag?></td><td class="order"><?php echo $besucher?></td><td class="order"><?php echo $seitenaufrufe?></td></tr>                                 
                                     <?php 
                                     $i++; 
                                     endforeach;                                   
