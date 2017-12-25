@@ -487,6 +487,53 @@ $country_data = $wpdb->get_results("SELECT `country` AS `name`, COUNT(`id`) AS `
     </div><!-- cell -->
 </div><!-- two-thirds -->
 
+
+<!-- Neue Statistik zur Anzeige von Tag, Besucher, Seitenaufrufe -->
+<div class="two-thirds column">
+    <div class="cell">
+
+        <div class="half column">
+            <div class="cell">
+
+                <div class="postbox-container">
+                    <div class="postbox fit-height">
+                        <h3><span><?php _e('Tagesstatistik','wp-power-stats') ?></span></h3>
+                        <div class="inside">
+                          <table>
+                           <tbody>
+        
+                            <?php
+        
+                            $data_array = "";
+                            $visits = array_reverse($visits);
+        
+                            if (is_array($visits) && !empty($visits)) {
+                                    $i=1; 
+                                    foreach ($visits as $day): 
+                                      if ($day['hits'] === null) $day['hits'] = 0;
+                                      if ($day['pageviews'] === null) $day['pageviews'] = 0;
+                                      $tag = $day['date'];
+                                      $besucher = $day['hits'];
+                                      $seitenaufrufe = $day['pageviews']; 
+                                      ?>
+                                      <tr><td class="order"><?php echo $i ?>.</td><td class="link"><?php echo $tag?></td><td class="link"><?php echo $besucher?></td><td class="link"><?php echo $seitenaufrufe?></td></tr>                                 
+                                    <?php 
+                                    $i++; 
+                                    endforeach;                                   
+        
+                            };
+                            ?>
+                           </tbody>
+                          </table>
+  
+                        </div><!-- inside -->
+                    </div><!-- postbox -->
+                </div><!-- postbox-container -->
+            </div><!-- cell -->
+        </div><!-- half -->
+
+    </div><!-- cell -->
+</div><!-- two-thirds -->
 <div class="clear"></div>
 
 </div><!-- metabox-holder -->
