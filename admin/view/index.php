@@ -90,7 +90,7 @@ foreach ($os_data as $os) {
     $oss[] = array("image" => strtolower($os['name']), "percent" => round($os['hits'] / $os_total_hits[0] * 100), "name" => strtr(ucfirst($os['name']), $browser_names));
 }
 /* Änderung: Mehr zeigen */
-$zeige_anzahl = 20;
+$zeige_anzahl = 30;
 $schnitt = 0;
 
 
